@@ -1,24 +1,51 @@
-import logo from './logo.svg';
-import './App.css';
-
+import Homepage from "./pages/Homepage";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
+import { persistor, store } from "./redux/store";
+import Dashboard from "./pages/Dashboard";
+import Signin from "./pages/Signin";
+import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import Properties from "./pages/Properties";
+import AddProperty from "./pages/AddProperty";
+import Listing from "./pages/Listing";
+import PrivateRoute from './components/PrivateRoute'
+import EditProperty from "./pages/EditProperty";
+import Profile from "./pages/Profile";
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Provider store={store}>
+      <PersistGate persistor={persistor}>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Homepage />} />
+            <Route path="/dashboard" element={<PrivateRoute />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+            </Route>
+            <Route path="/signin" element={<Signin />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/forgotpassword" element={<ForgotPassword />} />
+            <Route
+              path="/resetpassword/:id/:token"
+              element={<ResetPassword />}
+            />
+            <Route path="/properties" element={<Properties />} />
+            <Route path="/addproperties" element={<AddProperty />} />
+            <Route
+              path="/category/:typeName/:propertyId"
+              element={<Listing />}
+            />
+            <Route
+              path="/edit-property/:propertyId"
+              element={<EditProperty />}
+            />
+            <Route path="/profile" element={<Profile/>}/>
+          </Routes>
+        </BrowserRouter>
+      </PersistGate>
+    </Provider>
   );
 }
 
