@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { loginWithGoogle } from "../redux/authSlice";
-import jwt_decode from "jwt-decode";
+const { default: jwt_decode } = require("jwt-decode");
 import { request } from "../util/fetchAPI";
 
 const OAuth = () => {
