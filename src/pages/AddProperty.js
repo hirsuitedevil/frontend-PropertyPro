@@ -419,7 +419,7 @@ const AddProperty = () => {
               disabled={loading}
               className="p-3 bg-[#b2e3b2] rounded-lg uppercase hover:bg-green-300"
             >
-              {loading ? "Creating..." : "Create listing"}
+              {loading ? "Creating" : "Create listing"}
             </button>
           </div>
         </form>
