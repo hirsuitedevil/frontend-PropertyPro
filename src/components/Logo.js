@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React from "react";
-import logo from "C:/Users/Dhruv Agrawal/Desktop/PropertyPro/frontend/src/assets/logo.png";
+import logo from "../assets/logo.png";
 
 const Logo = () => {
   return (
