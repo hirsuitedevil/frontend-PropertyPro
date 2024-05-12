@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React from "react";
-import logo from "C:/Users/Dhruv Agrawal/Desktop/PropertyPro/frontend/src/assets/image.png";
+import logo from "../assets/image.png";
 const Footer = () => {
   const footerStyle = {
     background: "radial-gradient(circle at left bottom, #24382a  , #000000)",
