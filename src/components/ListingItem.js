@@ -15,7 +15,7 @@ const ListingItem = ({ listing, id, onDelete, onEdit }) => {
         <Link to={`/category/${listing.type}/${id}`}>
           <div className="row container">
             <img
-              src={`http://localhost:5000/images/${listing.img[0]}`}
+              src={`${REACT_APP_BACKEND_URL}/images/${listing.img[0]}`}
               height={200}
               width={300}
               className="h-[320px] sm:h-[220px] w-full object-cover p-2 rounded-2xl hover:scale-105 transition-scale duration-300"

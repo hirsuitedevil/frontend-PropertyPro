@@ -6,7 +6,7 @@ const MapComponent = ({ latitude, longitude }) => {
   useEffect(() => {
     // Initialize HERE Map
     const platform = new H.service.Platform({
-      apikey: "quhVrdb2B-bvrDCtO1tp14k3VKC4-6nGCh9BuZUBQTA",
+      apikey: `${REACT_APP_HEREMAPS_APIKEY}`,
     });
 
     const defaultLayers = platform.createDefaultLayers();

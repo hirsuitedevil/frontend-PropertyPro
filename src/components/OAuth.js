@@ -33,8 +33,7 @@ const OAuth = () => {
   useEffect(() => {
     /* global google*/
     google.accounts.id.initialize({
-      client_id:
-        "745056816479-2sqbja48boa5umsgbrmvnml30gjecfo0.apps.googleusercontent.com",
+      client_id: `${REACT_APP_GOOGLE_CLIENT_ID}`,
       callback: handleCallbackResponse,
     });
     google.accounts.id.renderButton(document.getElementById("signinDiv"), {

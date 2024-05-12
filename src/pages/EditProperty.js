@@ -151,7 +151,7 @@ const EditProperty = () => {
     let geoLocation = {};
     const loc = address + " , " + city + " , " + country
     const response = await fetch(
-      `https://geocode.search.hereapi.com/v1/geocode?q=${loc}&apiKey=quhVrdb2B-bvrDCtO1tp14k3VKC4-6nGCh9BuZUBQTA`
+      `https://geocode.search.hereapi.com/v1/geocode?q=${loc}&apiKey=${REACT_APP_HEREMAPS_APIKEY}`
     );
     const dat = await response.json();
     geoLocation.lat = dat.items[0].position.lat;

@@ -28,7 +28,7 @@ const Header = () => {
       "https://lh3.googleusercontent.com"
     )
       ? user.profileImg
-      : `http://localhost:5000/images/${user.profileImg}`;
+      : `${REACT_APP_BACKEND_URL}/images/${user.profileImg}`;
   }
   const handleHover = () => {
     if (dropdownTimeout) {

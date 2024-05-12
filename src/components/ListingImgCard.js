@@ -4,7 +4,7 @@ import React from "react";
 const ListingImgCard = ({ src }) => {
   return (
     <div className="">
-      <img src={`http://localhost:5000/images/${src}`} alt="Listing" />
+      <img src={`${REACT_APP_BACKEND_URL}/images/${src}`} alt="Listing" />
     </div>
   );
 };

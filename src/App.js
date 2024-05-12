@@ -14,6 +14,7 @@ import Listing from "./pages/Listing";
 import PrivateRoute from './components/PrivateRoute'
 import EditProperty from "./pages/EditProperty";
 import Profile from "./pages/Profile";
+
 function App() {
   return (
     <Provider store={store}>

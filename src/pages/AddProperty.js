@@ -126,7 +126,7 @@ const AddProperty = () => {
     const loc = address + " , " + city + " , " + country;
     console.log(loc);
     const response = await fetch(
-      `https://geocode.search.hereapi.com/v1/geocode?q=${loc}&apiKey=quhVrdb2B-bvrDCtO1tp14k3VKC4-6nGCh9BuZUBQTA`
+      `https://geocode.search.hereapi.com/v1/geocode?q=${loc}&apiKey=${process.env.REACT_APP_HEREMAPS_APIKEY}`
     );
     const dat = await response.json();
     console.log(dat);
