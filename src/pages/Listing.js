@@ -108,32 +108,32 @@ const Listing = () => {
           <div className="grid grid-cols-4 h-96">
             <div className="col-span-2 h-96">
               <img
-                src={`${REACT_APP_BACKEND_URL}/images/${listing.img[0]}`}
+                src={`${process.env.REACT_APP_BACKEND_URL}/images/${listing.img[0]}`}
                 alt="exterior image"
                 className="h-full w-full rounded-2xl"
               />
             </div>
             <div className="h-96">
               <img
-                src={`${REACT_APP_BACKEND_URL}/images/${listing.img[1]}`}
+                src={`${process.env.REACT_APP_BACKEND_URL}/images/${listing.img[1]}`}
                 alt="exterior image"
                 className="h-1/2 w-full p-2 rounded-2xl"
               />
               <img
-                src={`${REACT_APP_BACKEND_URL}/images/${listing.img[2]}`}
+                src={`${process.env.REACT_APP_BACKEND_URL}/images/${listing.img[2]}`}
                 alt="exterior image"
                 className="h-1/2 w-full rounded-2xl p-2"
               />
             </div>
             <div className="h-96">
               <img
-                src={`${REACT_APP_BACKEND_URL}/images/${listing.img[3]}`}
+                src={`${process.env.REACT_APP_BACKEND_URL}/images/${listing.img[3]}`}
                 alt="exterior image"
                 className="h-1/2 w-full rounded-2xl p-2"
               />
               <div className="relative h-1/2 w-full p-2">
                 <img
-                  src={`${REACT_APP_BACKEND_URL}/images/${listing.img[4]}`}
+                  src={`${process.env.REACT_APP_BACKEND_URL}/images/${listing.img[4]}`}
                   alt="Bathroom"
                   className="h-full w-full rounded-2xl object-cover"
                 />
