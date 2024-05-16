@@ -116,7 +116,7 @@ const Listing = () => {
             <div className="h-96">
               <img
                 src={`${process.env.REACT_APP_BACKEND_URL}/images/${listing.img[1]}`}
-                alt="exterior image"
+                alt="interior image"
                 className="h-1/2 w-full p-2 rounded-2xl"
               />
               <img
