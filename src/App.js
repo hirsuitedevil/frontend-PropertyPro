@@ -24,6 +24,17 @@ function App() {
             <Route path="/" element={<Homepage />} />
             <Route path="/dashboard" element={<PrivateRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/properties" element={<Properties />} />
+              <Route path="/addproperties" element={<AddProperty />} />
+              <Route
+                path="/category/:typeName/:propertyId"
+                element={<Listing />}
+              />
+              <Route
+                path="/edit-property/:propertyId"
+                element={<EditProperty />}
+              />
+              <Route path="/profile" element={<Profile />} />
             </Route>
             <Route path="/signin" element={<Signin />} />
             <Route path="/signup" element={<Signup />} />
@@ -32,17 +43,6 @@ function App() {
               path="/resetpassword/:id/:token"
               element={<ResetPassword />}
             />
-            <Route path="/properties" element={<Properties />} />
-            <Route path="/addproperties" element={<AddProperty />} />
-            <Route
-              path="/category/:typeName/:propertyId"
-              element={<Listing />}
-            />
-            <Route
-              path="/edit-property/:propertyId"
-              element={<EditProperty />}
-            />
-            <Route path="/profile" element={<Profile/>}/>
           </Routes>
         </BrowserRouter>
       </PersistGate>
