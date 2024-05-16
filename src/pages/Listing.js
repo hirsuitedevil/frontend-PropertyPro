@@ -45,7 +45,7 @@ const Listing = () => {
             "https://lh3.googleusercontent.com"
           )
             ? res.currentOwner.profileImg
-            : `${REACT_APP_BACKEND_URL}/images/${res.currentOwner.profileImg}`;
+            : `${process.env.REACT_APP_BACKEND_URL}/images/${res.currentOwner.profileImg}`;
           setProfileImgSrc(profileImageSrc);
         }
 
