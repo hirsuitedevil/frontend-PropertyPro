@@ -1,14 +1,19 @@
-/* eslint-disable */
-import { React, useState } from "react";
+import React, { useState, useEffect } from "react";
 import Layoutalt from "../components/Layout/Layoutalt";
 import PageHeader from "../components/PageHeader";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { useEffect } from "react";
 import { request } from "../util/fetchAPI";
 import Spinner from "../components/Spinner";
+import {
+  getDownloadURL,
+  ref,
+  uploadBytesResumable,
+  deleteObject,
+} from "firebase/storage";
+import { imageDb } from "../firebase/firebase";
+
 const EditProperty = () => {
-  const API_URL = "http://localhost:5000"
   const { user, token } = useSelector((state) => state.auth);
   const [listing, setListing] = useState(null);
   const [displayedImages, setDisplayedImages] = useState([]);
@@ -16,6 +21,7 @@ const EditProperty = () => {
   const [initialImages, setInitialImages] = useState([]);
   const navigate = useNavigate();
   const params = useParams();
+  const storageRef = ref(imageDb, "images");
   const [formData, setFormData] = useState({
     type: "Rent",
     title: "",
@@ -35,6 +41,7 @@ const EditProperty = () => {
     city: "",
     country: "",
   });
+
   const {
     type,
     title,
@@ -57,51 +64,61 @@ const EditProperty = () => {
 
   useEffect(() => {
     if (user) {
-      setFormData({
-        ...formData,
+      setFormData((prevFormData) => ({
+        ...prevFormData,
         useRef: user._id,
-      });
+      }));
     } else {
       navigate("/signin");
     }
   }, [user, navigate]);
+
+  useEffect(() => {
+    const fetchListing = async () => {
+      setLoading(true);
+      try {
+        const options = { "Content-Type": "application/json" };
+        const response = await request(
+          `/property/find?id=${params.propertyId}`,
+          "GET",
+          options
+        );
+        setListing(response);
+        setFormData({ ...response });
+
+        const initialImagesData = await Promise.all(
+          (response.img || []).map(async (img) => ({
+            name: img,
+            url: await getDownloadURL(ref(imageDb, `images/${img}`)),
+            file: null,
+          }))
+        );
+
+        setInitialImages(initialImagesData);
+        setDisplayedImages(initialImagesData);
+      } catch (error) {
+        console.error("Error fetching listing:", error);
+      }
+      setLoading(false);
+    };
+    fetchListing();
+  }, [params.propertyId]);
 
   const handleRemoveImage = (index) => {
     const filteredImages = displayedImages.filter((_, i) => i !== index);
     setDisplayedImages(filteredImages);
     setFormData((prevState) => ({
       ...prevState,
-      images: filteredImages.map((img) => img.file),
+      images: filteredImages.map((img) => img.file).filter(Boolean),
     }));
   };
-  useEffect (() =>{
-    setLoading(true);
-  const fetchListing = async() =>{
-    const options = {
-      "Content-Type":"application/json"
-    }
-    const response  = await request(`/property/find?id=${params.propertyId}`, "GET", options);
-    setListing(response);
-    setFormData({ ...response });
-    setInitialImages(
-      response.img.map((img) => ({ url: `${API_URL}/images/${img}` }))
-    );
-    setDisplayedImages(
-      response.img.map((img) => ({ url: `${API_URL}/images/${img}` }))
-    );
-    setLoading(false);
-  }
-  fetchListing();
-}
-,[params.propertyId, navigate]
-);
 
   const onChangeHandler = (e) => {
     if (e.target.id === "Sale" || e.target.id === "Rent") {
-      setFormData({
-        ...formData,
+      setFormData((prevState) => ({
+        ...prevState,
         type: e.target.id,
-      });
+      }));
     }
 
     if (
@@ -109,21 +126,22 @@ const EditProperty = () => {
       e.target.id === "furnished" ||
       e.target.id === "offer"
     ) {
-      setFormData({
-        ...formData,
+      setFormData((prevState) => ({
+        ...prevState,
         [e.target.id]: e.target.checked,
-      });
+      }));
     }
-    // files
+
     if (e.target.files) {
       const newImages = Array.from(e.target.files).map((file) => ({
         file,
         url: URL.createObjectURL(file),
       }));
-      setDisplayedImages([...newImages]);
-      setFormData((prevState) => ({
+      setDisplayedImages(newImages);
+      setFormData((prevState) => (
+        {
         ...prevState,
-        images: e.target.files,
+        images: [...newImages.map((img) => img.file)],
       }));
     }
 
@@ -132,48 +150,56 @@ const EditProperty = () => {
       e.target.type === "text" ||
       e.target.type === "textarea"
     ) {
-      setFormData({
-        ...formData,
+      setFormData((prevState) => ({
+        ...prevState,
         [e.target.id]: e.target.value,
-      });
+      }));
     }
   };
 
   const onChooseFilesClick = () => {
-    setDisplayedImages([]);
+    setDisplayedImages(initialImages);
   };
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    if (images < 6) {
+
+    let geoLocation = {};
+    const loc = `${address}, ${city}, ${country}`;
+    try {
+      const response = await fetch(
+        `https://geocode.search.hereapi.com/v1/geocode?q=${loc}&apiKey=${process.env.REACT_APP_HEREMAPS_APIKEY}`
+      );
+      const data = await response.json();
+      geoLocation.lat = data.items[0].position.lat;
+      geoLocation.lng = data.items[0].position.lng;
+    } catch (error) {
+      console.error("Geocoding error:", error);
+      setLoading(false);
       return;
     }
-    let geoLocation = {};
-    const loc = address + " , " + city + " , " + country
-    const response = await fetch(
-      `https://geocode.search.hereapi.com/v1/geocode?q=${loc}&apiKey=${process.env.REACT_APP_HEREMAPS_APIKEY}`
-    );
-    const dat = await response.json();
-    geoLocation.lat = dat.items[0].position.lat;
-    geoLocation.lng = dat.items[0].position.lng;
+
     let filenames = [];
-    const formData1 = new FormData();
-    let deleteImages = [];
     if (images && images.length > 0) {
-      for (let i = 0; i < images.length; i++) {
-        const filename = crypto.randomUUID() + images[i].name;
-        formData1.append("images", images[i], filename);
-        filenames.push(filename);
-        deleteImages = initialImages.map((image) => {
-          return image.url.split("/").pop();
-        });
+      try {
+        for (const file of images) {
+          if (file) {
+            const filename = `${crypto.randomUUID()}${file.name}`;
+            const imgRef = ref(imageDb, `images/${filename}`);
+            await uploadBytesResumable(imgRef, file);
+            filenames.push(filename);
+          }
+        }
+      } catch (error) {
+        console.error("Image upload error:", error);
+        setLoading(false);
+        return;
       }
     } else {
-      filenames = initialImages.map((image) => {
-        return image.url.split("/").pop();
-      });
+      filenames = initialImages.map((img) => img.name);
+      console.log(filenames);
     }
-    await request(`/upload/image/property`, "POST", {}, formData1, true);
+
     try {
       const options = {
         Authorization: `Bearer ${token}`,
@@ -190,23 +216,33 @@ const EditProperty = () => {
           longitude: geoLocation.lng,
         }
       );
+
       if (data) {
-        const headers = {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        };
-        const res = await request(`/upload/deleteImages`, "DELETE", headers, {
-          filenames: deleteImages,
-        });
-        navigate(`/category/${formData.type}/${data._id}`);
+        const oldImages = initialImages.map((image) => image.name);
+        const newImages = filenames;
+        for (const img of oldImages) {
+          if (!newImages.includes(img)) {
+            const imgRef = ref(imageDb, `images/${img}`);
+            await deleteObject(imgRef);
+          }
+        }
+        navigate(`/properties`);
       }
     } catch (error) {
-      console.log(error);
+      console.error("Property update error:", error);
+      for (const img of filenames) {
+        const imgRef = ref(imageDb, `images/${img}`);
+        await deleteObject(imgRef);
+      }
+    } finally {
+      setLoading(false);
     }
   };
+
   if (loading) {
     return <Spinner />;
   }
+
   return (
     <Layoutalt>
       <div>
@@ -413,7 +449,7 @@ const EditProperty = () => {
             <p className="font-semibold">
               Images:
               <span className="font-normal text-gray-600 ml-2">
-                The first image will be the cover (atleast 6)
+                The first image will be the cover (at least 6)
               </span>
             </p>
             <div className="flex gap-4">

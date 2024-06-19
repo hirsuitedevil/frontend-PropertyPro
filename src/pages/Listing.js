@@ -1,8 +1,7 @@
-/* eslint-disable */
-import { React, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../components/Layout/Header";
 import NotificationButton from "../components/NotificationButton";
-import { IoMdArrowBack, IoMdBed } from "react-icons/io";
+import { IoMdArrowBack } from "react-icons/io";
 import { FaShare, FaHeart, FaChair, FaParking } from "react-icons/fa";
 import { useParams, useNavigate } from "react-router-dom";
 import { request } from "../util/fetchAPI";
@@ -16,16 +15,23 @@ import MapComponent from "../components/MapComponent";
 import ProfileImg from "../components/ProfileImg";
 import { MdOutlineMessage } from "react-icons/md";
 import { BiSolidOffer } from "react-icons/bi";
-
+import { ref, getDownloadURL } from "firebase/storage";
+import { imageDb } from "../firebase/firebase";
+import {IoMdBed} from 'react-icons/io'
 const Listing = () => {
+  const storageRef = ref(imageDb, "images");
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [open, setOpen] = useState(false);
+  const [profileImgSrc, setProfileImgSrc] = useState("");
+  const [listingImg, setListingImg] = useState([]);
   const params = useParams();
+  const navigate = useNavigate();
+
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const [profileImgSrc, setProfileImgSrc] = useState("");
+
   useEffect(() => {
     const fetchListing = async () => {
       try {
@@ -41,14 +47,20 @@ const Listing = () => {
         }
         setListing(res);
         if (res) {
-          let profileImageSrc = res.currentOwner.profileImg.includes(
+          const profileImgUrl = res.currentOwner.profileImg.includes(
             "https://lh3.googleusercontent.com"
           )
             ? res.currentOwner.profileImg
-            : `${process.env.REACT_APP_BACKEND_URL}/images/${res.currentOwner.profileImg}`;
-          setProfileImgSrc(profileImageSrc);
-        }
+            : await getDownloadURL(
+                ref(storageRef, res.currentOwner.profileImg)
+              );
+          setProfileImgSrc(profileImgUrl);
 
+          const listingImages = await Promise.all(
+            res.img.map((currImg) => getDownloadURL(ref(storageRef, currImg)))
+          );
+          setListingImg(listingImages);
+        }
         setLoading(false);
       } catch (error) {
         setLoading(false);
@@ -57,16 +69,9 @@ const Listing = () => {
     fetchListing();
   }, [params.propertyId]);
 
-  const tabs = [
-    {
-      name: "Overview",
-    },
-    {
-      name: "Location",
-    },
-  ];
+  const tabs = [{ name: "Overview" }, { name: "Location" }];
   const [activeTab, setActiveTab] = useState(tabs[0].name);
-  const navigate = useNavigate();
+
   return (
     <div>
       <Header />
@@ -107,45 +112,57 @@ const Listing = () => {
           )}
           <div className="grid grid-cols-4 h-96">
             <div className="col-span-2 h-96">
-              <img
-                src={`${process.env.REACT_APP_BACKEND_URL}/images/${listing.img[0]}`}
-                alt="exterior image"
-                className="h-full w-full rounded-2xl"
-              />
-            </div>
-            <div className="h-96">
-              <img
-                src={`${process.env.REACT_APP_BACKEND_URL}/images/${listing.img[1]}`}
-                alt="interior image"
-                className="h-1/2 w-full p-2 rounded-2xl"
-              />
-              <img
-                src={`${process.env.REACT_APP_BACKEND_URL}/images/${listing.img[2]}`}
-                alt="exterior image"
-                className="h-1/2 w-full rounded-2xl p-2"
-              />
-            </div>
-            <div className="h-96">
-              <img
-                src={`${process.env.REACT_APP_BACKEND_URL}/images/${listing.img[3]}`}
-                alt="exterior image"
-                className="h-1/2 w-full rounded-2xl p-2"
-              />
-              <div className="relative h-1/2 w-full p-2">
+              {listingImg[0] && (
                 <img
-                  src={`${process.env.REACT_APP_BACKEND_URL}/images/${listing.img[4]}`}
-                  alt="Bathroom"
-                  className="h-full w-full rounded-2xl object-cover"
+                  src={listingImg[0]}
+                  alt="exterior image"
+                  className="h-full w-full rounded-2xl"
                 />
-                <button onClick={handleOpen}>
-                  <div className="absolute top-2 left-2 right-2 bottom-2 flex items-center justify-center text-white text-xl font-semibold bg-black bg-opacity-50 rounded-2xl">
-                    {listing.img.length - 5}+
-                  </div>
-                </button>
+              )}
+            </div>
+            <div className="h-96">
+              {listingImg[1] && (
+                <img
+                  src={listingImg[1]}
+                  alt="interior image"
+                  className="h-1/2 w-full p-2 rounded-2xl"
+                />
+              )}
+              {listingImg[2] && (
+                <img
+                  src={listingImg[2]}
+                  alt="exterior image"
+                  className="h-1/2 w-full rounded-2xl p-2"
+                />
+              )}
+            </div>
+            <div className="h-96">
+              {listingImg[3] && (
+                <img
+                  src={listingImg[3]}
+                  alt="exterior image"
+                  className="h-1/2 w-full rounded-2xl p-2"
+                />
+              )}
+              <div className="relative h-1/2 w-full p-2">
+                {listingImg[4] && (
+                  <img
+                    src={listingImg[4]}
+                    alt="Bathroom"
+                    className="h-full w-full rounded-2xl object-cover"
+                  />
+                )}
+                {listingImg.length > 5 && (
+                  <button onClick={handleOpen}>
+                    <div className="absolute top-2 left-2 right-2 bottom-2 flex items-center justify-center text-white text-xl font-semibold bg-black bg-opacity-50 rounded-2xl">
+                      {listingImg.length - 5}+
+                    </div>
+                  </button>
+                )}
                 {open && (
                   <Modal isOpen={open} close={handleClose}>
                     <ImgSlider
-                      items={listing.img.map((src) => ({ src }))}
+                      items={listingImg.map((src) => ({ src }))}
                       CardComponent={ListingImgCard}
                     />
                   </Modal>
@@ -169,7 +186,7 @@ const Listing = () => {
                     <FaBath className="h-6 w-6" />
                     {listing.bathrooms}
                     <span>
-                      {listing.bathrooms > 1 ? ` bedrooms` : `bedroom`}
+                      {listing.bathrooms > 1 ? ` bathrooms` : `bathroom`}
                     </span>
                   </p>
                   <p className="flex gap-1 items-center font-semibold text-sm">
@@ -180,7 +197,6 @@ const Listing = () => {
                     <FaParking className="h-6 w-6" />
                     {listing.parking ? "Yes" : "No"}
                   </p>
-
                   <p className="flex gap-1 items-center font-semibold text-sm">
                     <FaChair className="h-6 w-6" />
                     {listing.furnished ? "Yes" : "No"}
@@ -244,14 +260,14 @@ const Listing = () => {
                   {listing.type === "Rent" ? "/Month" : ""}
                 </span>
                 <hr className="w-[98%] border-1 mt-2" />
-                {listing.offer ? (
+                {listing.offer && (
                   <div>
                     <p className="text-slate-500 font-medium m-2 text-xl">
                       Market Price based on location
                     </p>
                     <div className="flex place-items-center">
                       <span className="text-2xl font-semibold m-2">
-                        Rs {listing.offer ? listing.regularPrice : ""}
+                        Rs {listing.regularPrice}
                       </span>
                       <span className="text-xs font-semibold">
                         {listing.type === "Rent" ? "/Month" : ""}
@@ -269,11 +285,8 @@ const Listing = () => {
                         </span>
                       </div>
                     </div>
-
                     <hr className="w-[98%] border-1 mt-2" />
                   </div>
-                ) : (
-                  ""
                 )}
                 <div className="mt-4 rounded-lg border-2 p-2 flex justify-between place-content-center w-[98%]">
                   <div className="flex place-items-center">

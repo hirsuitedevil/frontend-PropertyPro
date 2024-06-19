@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React from "react";
+import React,{useState, useEffect} from "react";
 import { Link } from "react-router-dom";
 import { IoMdBed } from "react-icons/io";
 import { FaBath } from "react-icons/fa6";
@@ -7,15 +7,27 @@ import { HiOutlineArrowsExpand } from "react-icons/hi";
 import { MdDelete } from "react-icons/md";
 import { FaLocationDot } from "react-icons/fa6";
 import { MdEditSquare } from "react-icons/md";
-
+import { imageDb } from "../firebase/firebase";
+import { ref, getDownloadURL } from "firebase/storage";
 const ListingItem = ({ listing, id, onDelete, onEdit }) => {
+  const storageRef = ref(imageDb,'images');
+  const [coverImage, setCoverImage] = useState('');
+  useEffect(() => {
+    const setCoverImg = async () => {
+      const listingImages = await Promise.resolve(
+          await getDownloadURL(ref(storageRef, listing.img[0]))
+      );
+      setCoverImage(listingImages);
+    };
+    setCoverImg();
+  }, []);
   return (
     <div className="p-2">
       <div className="bg-white hover:shadow-lg transition-shadow rounded-2xl w-full border-[1.5px]">
         <Link to={`/category/${listing.type}/${id}`}>
           <div className="row container">
             <img
-              src={`${process.env.REACT_APP_BACKEND_URL}/images/${listing.img[0]}`}
+              src={coverImage}
               height={200}
               width={300}
               className="h-[320px] sm:h-[220px] w-full object-cover p-2 rounded-2xl hover:scale-105 transition-scale duration-300"

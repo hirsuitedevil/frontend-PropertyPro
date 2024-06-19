@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useSelector } from "react-redux";
 import Logo from "../Logo";
 import { FaCommentDots } from "react-icons/fa";
@@ -13,23 +13,30 @@ import DropdownItem from "../DropdownItem";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../../redux/authSlice";
-
+import { imageDb } from "../../firebase/firebase";
+import { ref, getDownloadURL } from "firebase/storage";
 const Header = () => {
+  const storageRef = ref(imageDb, 'images');
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isDropdownVisible, setDropdownVisible] = useState(false);
-  const [dropdownTimeout, setDropdownTimeout] = useState(null); // Timeout reference
+  const [dropdownTimeout, setDropdownTimeout] = useState(null);
   const { user } = useSelector((state) => state.auth);
   const notificationCount = 5;
   const msgCount = 2;
-  let profileImgSrc;
-  if (user) {
-    profileImgSrc = user.profileImg.includes(
-      "https://lh3.googleusercontent.com"
-    )
-      ? user.profileImg
-      : `${process.env.REACT_APP_BACKEND_URL}/images/${user.profileImg}`;
-  }
+  const [profileImgSrc,setProfileImgSrc] = useState('');
+  useEffect(()=>{
+    const setProfileImg = async ()=>{
+      if (user) {
+        user.profileImg.includes(
+          "https://lh3.googleusercontent.com"
+        )
+          ? setProfileImgSrc(user.profileImg)
+          : setProfileImgSrc(await getDownloadURL(ref(storageRef, user.profileImg)));
+      }
+    }
+    setProfileImg();
+  },[user])
   const handleHover = () => {
     if (dropdownTimeout) {
       clearTimeout(dropdownTimeout);
@@ -70,8 +77,8 @@ const Header = () => {
 
         <div
           className="relative"
-          onMouseEnter={handleHover} // Trigger hover effect
-          onMouseLeave={handleLeave} // Trigger delayed leave effect
+          onMouseEnter={handleHover}
+          onMouseLeave={handleLeave}
         >
           <ProfileImg src={profileImgSrc} />
           {isDropdownVisible && (

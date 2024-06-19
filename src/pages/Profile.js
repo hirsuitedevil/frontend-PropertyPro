@@ -7,8 +7,6 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { request } from '../util/fetchAPI'
 import { updateName } from "../redux/authSlice";
-import { FaEdit } from 'react-icons/fa';
-import { MdDoneOutline } from 'react-icons/md';
 
 const Profile = () => {
   const [changeDetails, setchangeDetails] = useState(false);

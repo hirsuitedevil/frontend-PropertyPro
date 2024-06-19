@@ -10,6 +10,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { request } from "../util/fetchAPI";
 import ListingItem from "../components/ListingItem";
 import Spinner from "../components/Spinner";
+import { imageDb } from "../firebase/firebase";
+import { ref, deleteObject } from "firebase/storage";
 
 const Properties = () => {
   const [listing, setListing] = useState(null);
@@ -60,9 +62,16 @@ const Properties = () => {
         let deleteImg = [];
         const data = await request(`/property/find?id=${listingId}`, "GET");
         deleteImg = data.img;
-        await request(`/upload/deleteImages`, "DELETE", headers, {
-          filenames: deleteImg,
-        });
+        deleteImg.map((deleteImage)=>{
+          const Imgref = ref(imageDb, `images/${deleteImage}`); 
+          deleteObject(Imgref)
+            .then(() => {
+              console.log("Image Deleted");
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        })
         await request(`/property/delete/${listingId}`, "DELETE", headers);
         setListing((prevListings) =>
           prevListings.filter((listing) => listing._id !== listingId)

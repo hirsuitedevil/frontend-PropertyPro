@@ -1,15 +1,22 @@
-/* eslint-disable */
-import { React, useState } from "react";
+import React, { useState, useEffect } from "react";
 import Layoutalt from "../components/Layout/Layoutalt";
 import PageHeader from "../components/PageHeader";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { useEffect } from "react";
 import { request } from "../util/fetchAPI";
+import { imageDb } from "../firebase/firebase";
+import {
+  uploadBytesResumable,
+  ref,
+  deleteObject,
+  getDownloadURL,
+} from "firebase/storage";
+
 const AddProperty = () => {
   const { user, token } = useSelector((state) => state.auth);
   const [displayedImages, setDisplayedImages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [uploadedImages, setUploadedImages] = useState([]);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     type: "Rent",
@@ -52,10 +59,10 @@ const AddProperty = () => {
 
   useEffect(() => {
     if (user) {
-      setFormData({
-        ...formData,
+      setFormData((prevFormData) => ({
+        ...prevFormData,
         useRef: user._id,
-      });
+      }));
     } else {
       navigate("/signin");
     }
@@ -72,10 +79,10 @@ const AddProperty = () => {
 
   const onChangeHandler = (e) => {
     if (e.target.id === "Sale" || e.target.id === "Rent") {
-      setFormData({
-        ...formData,
+      setFormData((prevState) => ({
+        ...prevState,
         type: e.target.id,
-      });
+      }));
     }
 
     if (
@@ -83,14 +90,13 @@ const AddProperty = () => {
       e.target.id === "furnished" ||
       e.target.id === "offer"
     ) {
-      setFormData({
-        ...formData,
+      setFormData((prevState) => ({
+        ...prevState,
         [e.target.id]: e.target.checked,
-      });
+      }));
     }
-    // files
+
     if (e.target.files) {
-      setDisplayedImages([]);
       const filesArray = Array.from(e.target.files);
       setDisplayedImages(
         filesArray.map((file) => ({
@@ -98,7 +104,6 @@ const AddProperty = () => {
           url: URL.createObjectURL(file),
         }))
       );
-
       setFormData((prevState) => ({
         ...prevState,
         images: filesArray,
@@ -110,66 +115,74 @@ const AddProperty = () => {
       e.target.type === "text" ||
       e.target.type === "textarea"
     ) {
-      setFormData({
-        ...formData,
+      setFormData((prevState) => ({
+        ...prevState,
         [e.target.id]: e.target.value,
-      });
+      }));
     }
   };
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    if (images < 6) {
+    if (images.length < 6) {
+      alert("Please upload at least 6 images");
       return;
     }
-    let geoLocation = {};
-    const loc = address + " , " + city + " , " + country;
-    console.log(loc);
-    const response = await fetch(
-      `https://geocode.search.hereapi.com/v1/geocode?q=${loc}&apiKey=${process.env.REACT_APP_HEREMAPS_APIKEY}`
-    );
-    const dat = await response.json();
-    console.log(dat);
-    geoLocation.lat = dat.items[0].position.lat;
-    geoLocation.lng = dat.items[0].position.lng;
-    console.log(dat);
-    let filenames = [];
-    const formData1 = new FormData();
 
-    if (images && images.length > 0) {
-      for (let i = 0; i < images.length; i++) {
-        const filename = crypto.randomUUID() + images[i].name;
-        formData1.append("images", images[i], filename);
+    setLoading(true);
+
+    let geoLocation = {};
+    const loc = `${address}, ${city}, ${country}`;
+    try {
+      const response = await fetch(
+        `https://geocode.search.hereapi.com/v1/geocode?q=${loc}&apiKey=${process.env.REACT_APP_HEREMAPS_APIKEY}`
+      );
+      const data = await response.json();
+      geoLocation.lat = data.items[0].position.lat;
+      geoLocation.lng = data.items[0].position.lng;
+    } catch (error) {
+      console.error("Geocoding error:", error);
+      setLoading(false);
+      return;
+    }
+
+    let filenames = [];
+    try {
+      for (const file of images) {
+        const filename = `${crypto.randomUUID()}${file.name}`;
+        const imgRef = ref(imageDb, `images/${filename}`);
+        await uploadBytesResumable(imgRef, file);
         filenames.push(filename);
       }
-    } else {
+      setUploadedImages(filenames);
+    } catch (error) {
+      console.error("Image upload error:", error);
+      setLoading(false);
       return;
     }
-
-    const data = await request(
-      `/upload/image/property`,
-      "POST",
-      {},
-      formData1,
-      true
-    );
 
     try {
       const options = {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       };
-      const data = await request(`/property`, "POST", options, {
+      const response = await request(`/property`, "POST", options, {
         ...formData,
         img: filenames,
         latitude: geoLocation.lat,
         longitude: geoLocation.lng,
       });
-      if (data) {
-        navigate(`/category/${formData.type}/${data._id}`);
+      if (response) {
+        navigate("/properties");
       }
     } catch (error) {
-      console.log(error);
+      console.error("Property creation error:", error);
+      for (const img of filenames) {
+        const imgRef = ref(imageDb, `images/${img}`);
+        await deleteObject(imgRef);
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -379,7 +392,7 @@ const AddProperty = () => {
             <p className="font-semibold">
               Images:
               <span className="font-normal text-gray-600 ml-2">
-                The first image will be the cover (atleast 6)
+                The first image will be the cover (at least 6)
               </span>
             </p>
             <div className="flex gap-4">
