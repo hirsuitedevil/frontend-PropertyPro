@@ -4,12 +4,12 @@ import {getStorage} from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_apikey,
-  authDomain: process.env.REACT_APP_FIREBASE_authDomain,
-  projectId: process.env.REACT_APP_FIREBASE_projectId,
-  storageBucket: process.env.REACT_APP_FIREBASE_storageBucket,
-  messagingSenderId: process.env.REACT_APP_FIREBASE_messagingSenderId,
-  appId: process.env.REACT_APP_FIREBASE_appId,
-  measurementId: process.env.REACT_APP_FIREBASE_measurementId,
+  authDomain: "property-pro-hirsuite.firebaseapp.com",
+  projectId: "property-pro-hirsuite",
+  storageBucket: "property-pro-hirsuite.appspot.com",
+  messagingSenderId: "556867948456",
+  appId: "1:556867948456:web:58584dfe7b8ad863f7179d",
+  measurementId: "G-XBWCHXE6S0",
 };
 
 const app = initializeApp(firebaseConfig);
