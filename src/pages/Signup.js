@@ -10,6 +10,8 @@ import OAuth from "../components/OAuth";
 import sideImg from "../assets/signin-house.jpg";
 import avatar from "../assets/avatar.jpg";
 import { FaEyeSlash } from "react-icons/fa6";
+import { imageDb } from "../firebase/firebase";
+import { ref, uploadBytesResumable } from "firebase/storage";
 
 const Signup = () => {
   const [showPassword, setshowPassword] = useState(false);
@@ -17,6 +19,7 @@ const Signup = () => {
   const [error, setError] = useState(null);
   const [photo, setPhoto] = useState("");
   const [displayedImages, setDisplayedImages] = useState([]);
+  const storageRef = ref(imageDb,"images");
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -37,17 +40,17 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      let filename = null;
+      let filenames = null;
       if (photo) {
         console.log(photo[0]);
         if (photo[0].type !== "image/jpeg") {
-          setError("Only .jpg profile pictures are allowed."); // Set error message
+          setError("Only .jpg profile pictures are allowed.");
           return;
         }
-        const formData = new FormData();
-        filename = crypto.randomUUID() + photo[0].name;
-        formData.append("image", photo[0], filename);
-        await request("/upload/image", "POST", {}, formData, true);
+        const filename = `${crypto.randomUUID()}${photo[0].name}`;
+        const imgRef = ref(imageDb, `images/${filename}`);
+        await uploadBytesResumable(imgRef, photo[0]);
+        filenames=(filename);
       } else {
         return;
       }
@@ -57,7 +60,7 @@ const Signup = () => {
       };
       const responseData = await request("/auth/register", "POST", headers, {
         ...state,
-        profileImg: filename,
+        profileImg: filenames,
       });
       dispatch(register(responseData));
       navigate("/signin");

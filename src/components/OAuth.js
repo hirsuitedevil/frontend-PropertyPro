@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { loginWithGoogle } from "../redux/authSlice";
-const { default: jwt_decode } = require("jwt-decode");
+import { jwtDecode } from "jwt-decode";
 import { request } from "../util/fetchAPI";
 
 const OAuth = () => {
@@ -13,8 +13,9 @@ const OAuth = () => {
 
   async function handleCallbackResponse(response) {
     try {
-      const userObject = await jwt_decode(response.credential);
-      const { name, email, picture } = userObject; // Extract required properties
+      const userObject = jwtDecode(response.credential);
+      const { name, email, picture } = userObject;
+      console.log(userObject);
       const options = {
         "Content-Type": "application/json",
       };
@@ -23,6 +24,7 @@ const OAuth = () => {
         name,
         picture,
       });
+      console.log(data);
       dispatch(loginWithGoogle(data));
       navigate("/dashboard");
     } catch (error) {

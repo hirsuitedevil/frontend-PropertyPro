@@ -18,6 +18,7 @@ import { BiSolidOffer } from "react-icons/bi";
 import { ref, getDownloadURL } from "firebase/storage";
 import { imageDb } from "../firebase/firebase";
 import {IoMdBed} from 'react-icons/io'
+import { useDispatch, useSelector } from "react-redux";
 const Listing = () => {
   const storageRef = ref(imageDb, "images");
   const [listing, setListing] = useState(null);
@@ -26,6 +27,8 @@ const Listing = () => {
   const [open, setOpen] = useState(false);
   const [profileImgSrc, setProfileImgSrc] = useState("");
   const [listingImg, setListingImg] = useState([]);
+  const [owner, setOwner] = useState('');
+  const {user} = useSelector((state)=>(state.auth));
   const params = useParams();
   const navigate = useNavigate();
 
@@ -45,6 +48,7 @@ const Listing = () => {
           setLoading(false);
           return;
         }
+        setOwner(res.currentOwner._id);
         setListing(res);
         if (res) {
           const profileImgUrl = res.currentOwner.profileImg.includes(
@@ -302,7 +306,8 @@ const Listing = () => {
                   </div>
                   <NotificationButton
                     icon={MdOutlineMessage}
-                    onClick={() => console.log("Text Message clicked")}
+                    onClick={()=>navigate('/chat', {state:{receiverId:owner}})}
+                    isDisabled = {owner===user._id}
                   />
                 </div>
               </div>

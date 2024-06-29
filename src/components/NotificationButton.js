@@ -1,8 +1,8 @@
 /* eslint-disable */
 import React, { useState } from "react";
 
-const NotificationButton = ({ icon: Icon, count, onClick }) => {
-  const [hovered, setHovered] = useState(false); // Boolean state
+const NotificationButton = ({ icon: Icon, count, onClick, isDisabled }) => {
+  const [hovered, setHovered] = useState(false);
 
   const handleMouseEnter = () => {
     setHovered(true);
@@ -25,10 +25,11 @@ const NotificationButton = ({ icon: Icon, count, onClick }) => {
       <button
         className={`bg-white  border-2 p-2 rounded-lg ${
           hovered ? "shadow-xl" : "shadow-md"
-        } flex items-center justify-center `}
+        } flex items-center justify-center`}
         onClick={handleClick}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        disabled={isDisabled}
       >
         <Icon className="w-[20px] h-[20px] text-gray-600" />
       </button>

@@ -5,16 +5,18 @@ import Logo from "../Logo";
 import { FaCommentDots } from "react-icons/fa";
 import { IoNotifications } from "react-icons/io5";
 import { CgProfile } from "react-icons/cg";
-import { CiLogout, CiEdit } from "react-icons/ci";
+import { CiLogout } from "react-icons/ci";
 import NotificationButton from "../NotificationButton";
 import SearchBox from "../SearchBox";
-import ProfileImg from "../ProfileImg";
 import DropdownItem from "../DropdownItem";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../../redux/authSlice";
+import {logoutChat} from "../../redux/chatSlice";
 import { imageDb } from "../../firebase/firebase";
 import { ref, getDownloadURL } from "firebase/storage";
+import { IoHome } from "react-icons/io5";
+
 const Header = () => {
   const storageRef = ref(imageDb, 'images');
   const navigate = useNavigate();
@@ -54,19 +56,26 @@ const Header = () => {
 
   const handleLogout = () => {
     dispatch(logout());
+    dispatch(logoutChat());
     navigate("/");
   };
 
   return (
     <div className="flex justify-between items-center bg-white px-6 py-3 shadow-sm">
       <Logo />
-
       <SearchBox />
       <div className="flex items-center space-x-4">
         <NotificationButton
+          icon={IoHome}
+          onClick={() => {
+            dispatch(logoutChat());
+            navigate("/dashboard");
+            }}
+        />
+        <NotificationButton
           icon={FaCommentDots}
           count={msgCount}
-          onClick={() => console.log("Comments clicked")}
+          onClick={() => navigate("/chat")}
         />
         <NotificationButton
           icon={IoNotifications}
@@ -80,7 +89,7 @@ const Header = () => {
           onMouseEnter={handleHover}
           onMouseLeave={handleLeave}
         >
-          <ProfileImg src={profileImgSrc} />
+          <img src={profileImgSrc} alt="Profile Img" className="rounded-full object-cover h-8 w-8" />
           {isDropdownVisible && (
             <ul className="absolute z-10 min-w-[180px] bg-white p-3 rounded-md border shadow-lg right-0 mt-2">
               <DropdownItem icon={CgProfile} name="Profile" link="/profile" />
