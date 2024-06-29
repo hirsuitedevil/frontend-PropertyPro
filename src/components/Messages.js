@@ -13,12 +13,7 @@ const Messages = () => {
   const [loading, setLoading] = useState(false);
   const { socket } = useSocketContext();
 
-  useEffect(() => {
-    socket?.on("newMessage", (newMessage) => {
-      dispatch(addNewMessage(newMessage));
-    });
-    return () => socket?.off("newMessage");
-  }, [socket, messages]);
+  
 
   useEffect(() => {
     const MessageControl = async()=>{

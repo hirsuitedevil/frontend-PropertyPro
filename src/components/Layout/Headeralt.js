@@ -6,7 +6,7 @@ const Headeralt = () => {
   return (
     <header className="bg-white py-1 px-3">
       <div className="container mx-auto flex justify-between items-center">
-        <Logo />
+        <Logo navigateTo={""}/>
         <nav>
           <ul className="hidden sm:flex items-center space-x-8">
             <li>

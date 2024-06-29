@@ -1,8 +1,10 @@
 /* eslint-disable */
 import React from "react";
 import { FaArrowRight } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
   return (
     <div className="bg-[url('./assets/background.png')] bg-cover bg-center p-12">
       <div className="max-w-7xl mx-auto text-center py-16 px-4 sm:px-6 lg:px-8">
@@ -20,12 +22,12 @@ const HeroSection = () => {
 
         <div className="mt-8 flex justify-center">
           <div className="ml-3 inline-flex rounded-md shadow">
-            <a
-              href="#"
+            <button
+              onClick={()=>navigate('/signin')}
               className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
             >
               Get Started <FaArrowRight className="ml-2" />
-            </a>
+            </button>
           </div>
           <div className="ml-3 inline-flex">
             <a

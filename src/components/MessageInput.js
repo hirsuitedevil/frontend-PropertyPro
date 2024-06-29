@@ -27,23 +27,20 @@ const MessageInput = () => {
     };
     try {
       if(receiverId){
-        const res = await request(
+        await request(
           `/messages/send/${receiverId}`,
           "POST",
           headers,
           { content: message }
         );
       }else{
-        const res = await request(
+        await request(
           `/messages/send/${receiverIdcpy}`,
           "POST",
           headers,
           { content: message }
         );
-      }
-      
-
-      
+      }      
       setMessage("");
     } catch (err) {
       setError(err.message);
