@@ -6,39 +6,31 @@ const Headeralt = () => {
   return (
     <header className="bg-white py-1 px-3">
       <div className="container mx-auto flex justify-between items-center">
-        <Logo navigateTo={""}/>
+        <Logo navigateTo={""} />
         <nav>
           <ul className="hidden sm:flex items-center space-x-8">
             <li>
-              <Link to="/" className="text-gray-800 hover:text-gray-600">
+              <a href="#home" className="text-gray-800 hover:text-gray-600">
                 Home
-              </Link>
+              </a>
             </li>
             <li>
-              <Link to="/about" className="text-gray-800 hover:text-gray-600">
+              <a href="#about-us" className="text-gray-800 hover:text-gray-600">
                 About us
-              </Link>
+              </a>
             </li>
             <li>
-              <Link
-                to="/how-it-works"
+              <a
+                href="#testimonials"
                 className="text-gray-800 hover:text-gray-600"
               >
-                How it works
-              </Link>
+                Testimonials
+              </a>
             </li>
             <li>
-              <Link
-                to="/features"
-                className="text-gray-800 hover:text-gray-600"
-              >
-                Feature
-              </Link>
-            </li>
-            <li>
-              <Link to="/faq" className="text-gray-800 hover:text-gray-600">
+              <a href="#faq" className="text-gray-800 hover:text-gray-600">
                 FAQ
-              </Link>
+              </a>
             </li>
           </ul>
         </nav>

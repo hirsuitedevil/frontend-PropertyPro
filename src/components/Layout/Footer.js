@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React from "react";
-
+import logo from "../../assets/image.png";
 const Footer = () => {
   const footerStyle = {
     background: "radial-gradient(circle at left bottom, #24382a  , #000000)",
@@ -16,7 +16,11 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="flex flex-wrap justify-between items-start text-gray-300">
           <div className="mb-6">
-            <img src='./assets/image.png' alt="PropertyPro Logo" className="h-12 mb-8" />
+            <img
+              src={logo}
+              alt="PropertyPro Logo"
+              className="h-12 mb-8"
+            />
             <div className="mb-2">
               <p className="">Technology Park 9 -12</p>
               <p className="">Marie Curie Street 08987</p>

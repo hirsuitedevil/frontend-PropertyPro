@@ -6,40 +6,56 @@ import { setSelectedConversation, addNewMessage } from "../redux/chatSlice";
 import { useSocketContext } from "../context/SocketContext";
 
 const Messages = () => {
-  const { messages, receiverId, newMessage } = useSelector((state) => state.chat);
-  const lastMessageRef = useRef(null);
-  const {token} = useSelector((state)=>(state.auth));
+  const { messages, receiverId, newMessage } = useSelector(
+    (state) => state.chat
+  );
+  const { token } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const { socket } = useSocketContext();
-
-  
+  const lastMessageRef = useRef(null);
 
   useEffect(() => {
-    const MessageControl = async()=>{
-      if (messages && messages.length > 0) {
-        setTimeout(() => {
-          lastMessageRef.current?.scrollIntoView({ behavior: "smooth" });
-        }, 100);
-      } else if (!messages) {
+    socket?.on("newMessage", (newMessage) => {
+      dispatch(addNewMessage(newMessage));
+    });
+
+    return () => socket?.off("newMessage");
+  }, [socket, dispatch]);
+
+  useEffect(() => {
+    const fetchMessages = async () => {
+      if (!messages) {
         setLoading(true);
-        const headers = {
-          "Content-Type": "Application/json",
-          "Authorization": `Bearer ${token}`,
-        };
-        const res = await request(
-          `/conversations/getConvByUsers/${receiverId}`,
-          "GET",
-          headers
-        );
-        if(res){
-          dispatch(setSelectedConversation(res));
+        try {
+          const headers = {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          };
+          const res = await request(
+            `/conversations/getConvByUsers/${receiverId}`,
+            "GET",
+            headers
+          );
+          if (res) {
+            dispatch(setSelectedConversation(res));
+          }
+        } catch (error) {
+          console.error("Error fetching messages:", error);
+        } finally {
+          setLoading(false);
         }
-        setLoading(false);
       }
+    };
+
+    fetchMessages();
+  }, [receiverId, token, messages, dispatch]);
+
+  useEffect(() => {
+    if (messages && messages.length > 0) {
+      lastMessageRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-    MessageControl();
-  }, [messages, newMessage]);
+  }, [messages]);
 
   return (
     <div className="px-4 flex-1 overflow-auto">
@@ -50,12 +66,12 @@ const Messages = () => {
       {!loading &&
         messages &&
         messages.length > 0 &&
-        messages.map((messageId, index) => (
+        messages.map((message, index) => (
           <div
-            key={messageId}
+            key={message._id}
             ref={index === messages.length - 1 ? lastMessageRef : null}
           >
-            <Message messageId={messageId} />
+            <Message messageId={message} />
           </div>
         ))}
     </div>

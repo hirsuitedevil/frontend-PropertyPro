@@ -16,6 +16,7 @@ import EditProperty from "./pages/EditProperty";
 import Profile from "./pages/Profile";
 import Chat from "./pages/Chat";
 import { SocketContextProvider } from "./context/SocketContext";
+import Feedback from "./pages/Feedback";
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
               />
               <Route path="/profile" element={<Profile />} />
               <Route path="/chat" element={<Chat />} />
+              <Route path="/feedback" element={<Feedback />} />
             </Routes>
           </BrowserRouter>
         </SocketContextProvider>

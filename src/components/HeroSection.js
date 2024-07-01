@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 const HeroSection = () => {
   const navigate = useNavigate();
   return (
-    <div className="bg-[url('./assets/background.png')] bg-cover bg-center p-12">
+    <div className="bg-[url('./assets/background.png')] bg-cover bg-center p-12" id="home">
       <div className="max-w-7xl mx-auto text-center py-16 px-4 sm:px-6 lg:px-8">
         <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
           Explore the Finest Real Estate Listings and Find Your Perfect Haven!

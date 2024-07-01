@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { request } from "../util/fetchAPI";
 
 const MessageContainer = () => {
-  const { selectedChatId, participants, receiverId, newMessage } = useSelector((state) => state.chat);
+  const { selectedChatId, participants, receiverId } = useSelector((state) => state.chat);
   const { user, token } = useSelector((state) => state.auth);
   const [receiverName, setReceiverName] = useState("");
   const [loading, setLoading] = useState(true);
@@ -15,7 +15,6 @@ const MessageContainer = () => {
   if(!receiverId && participants){
     receiverIdcpy = participants.find((id)=>id!==user._id);
   }
-
   useEffect(() => {
     const getUserDetails = async () => {
       setLoading(true);
@@ -46,7 +45,7 @@ const MessageContainer = () => {
       }
     };
       getUserDetails();
-  }, [selectedChatId, receiverId, token, newMessage]);
+  }, [selectedChatId, receiverId, token]);
 
   if (loading) {
     return <div>Loading...</div>;

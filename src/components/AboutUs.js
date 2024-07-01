@@ -3,7 +3,7 @@ import React from "react";
 
 const AboutUs = () => {
   return (
-    <div className="bg-cover bg-center p-12">
+    <div className="bg-cover bg-center p-12" id="about-us">
       <button className="rounded-full bg-green-100 p-3 px-4 text-lime-800 font-semibold">
         About Us
       </button>

@@ -49,6 +49,7 @@ const FAQ = () => {
   return (
     <div
       className={`p-8 bg-white py-4 bg-[url('./assets/grid-bg.png')] bg-cover bg-center`}
+      id = "faq"
     >
       <div className="max-w-7xl mx-auto text-center py-8 px-4">
         <h1 className="text-4xl font-bold text-gray-900">
