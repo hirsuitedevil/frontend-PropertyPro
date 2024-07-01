@@ -27,7 +27,8 @@ const TestimonialCard = ({ name, feedback, profileImg, rating }) => {
           <p className="text-gray-900 leading-none text-lg font-bold">{name}</p>
           <div className="flex justify-center mt-2">
             {Array.from({ length: rating }, (_, i) => (
-              <FaStar key={i} className="text-yellow-500" />
+              <span className="text-yellow-500 text-3xl">&#9733;</span>
+              
             ))}
           </div>
           <hr className=" w-[75%] mx-auto mt-4 bg-gray-100 h-1 border-0 rounded dark:bg-gray-700" />
