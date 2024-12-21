@@ -32,7 +32,7 @@ const Signin = () => {
       dispatch(login(data));
       navigate("/dashboard");
     } catch (error) {
-      setErrorMessage("Invalid email or password");
+      setErrorMessage(error.message);
       console.log(error);
     }
   };
