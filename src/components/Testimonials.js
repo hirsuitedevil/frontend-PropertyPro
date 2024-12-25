@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React,{useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import sampleImage from "../assets/images.jpg";
 import Slider from "./Slider";
 import TestimonialCard from "./TestimonialCard";
@@ -31,7 +31,7 @@ const Testimonials = () => {
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
-      id = "testimonials"
+      id="testimonials"
     >
       <div className="max-w-7xl mx-auto text-center py-8 px-4 sm:px-6 lg:px-8">
         <h1 className="text-4xl font-bold text-gray-900">
